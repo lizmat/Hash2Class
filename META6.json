@@ -13,7 +13,7 @@
     "Hash2Class" : "lib/Hash2Class.pm6"
   },
   "resources" : [ ],
-  "source-url" : "",
+  "source-url" : "https://github.com/lizmat/Hash2Class.git",
   "tags" : [
     "JSON",
     "CLASS"
