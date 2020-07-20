@@ -3,7 +3,7 @@
 
 use nqp;
 
-#---------- support for handling arrays in the original hash -----------------------------------------------------------
+#---------- support for handling arrays in the original hash -------------------
 
 # Class to replace original Array with a List with objectification
 my class Hash2Class::List is List {
@@ -146,7 +146,7 @@ my sub array-hash2class(str $name, \type) is raw {
     }
 }
 
-#---------- support for handling hashes in the original hash -----------------------------------------------------------
+#---------- support for handling hashes in the original hash -------------------
 
 # Class to replace original Hash with a Map with objectification
 my class Hash2Class::Map is Map {
@@ -287,7 +287,7 @@ my sub hash-hash2class(str $name, \type) is raw {
     }
 }
 
-#---------- support for handling scalars in the original hash ----------------------------------------------------------
+#---------- support for handling scalars in the original hash ------------------
 
 # Returns method for handling a simple typecheck
 my sub scalar-type(str $name, $type is raw) {
@@ -382,7 +382,7 @@ my sub scalar-hash2class(str $name, $type is raw) {
 my $sigils := nqp::hash('$', 1, '@', 1, '%', 1);
 
 # The actual role that does the work
-role Hash2Class:ver<0.0.1>:auth<cpan:ELIZABETH>[*@list, *%hash] {
+role Hash2Class:ver<0.0.2>:auth<cpan:ELIZABETH>[*@list, *%hash] {
     has $!data;  # the raw data in a Hash
 
     method !data() is raw { $!data }
