@@ -3,7 +3,9 @@
   "authors" : [
     "Elizabeth Mattijsen"
   ],
-  "build-depends" : [ ],
+  "build-depends" : [
+    "Random::Names"
+  ],
   "depends" : [ ],
   "description" : "A role to create class instances out of a Hash",
   "license" : "Artistic-2.0",
@@ -12,12 +14,14 @@
   "provides" : {
     "Hash2Class" : "lib/Hash2Class.pm6"
   },
-  "resources" : [ ],
+  "resources" : [
+    "bin/skeleton"
+  ],
   "source-url" : "https://github.com/lizmat/Hash2Class.git",
   "tags" : [
     "JSON",
     "CLASS"
   ],
   "test-depends" : [ ],
-  "version" : "0.0.2"
+  "version" : "0.0.3"
 }

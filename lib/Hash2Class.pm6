@@ -382,7 +382,7 @@ my sub scalar-hash2class(str $name, $type is raw) {
 my $sigils := nqp::hash('$', 1, '@', 1, '%', 1);
 
 # The actual role that does the work
-role Hash2Class:ver<0.0.2>:auth<cpan:ELIZABETH>[*@list, *%hash] {
+role Hash2Class:ver<0.0.3>:auth<cpan:ELIZABETH>[*@list, *%hash] {
     has $!data;  # the raw data in a Hash
 
     method !data() is raw { $!data }
@@ -521,6 +521,20 @@ L<JSON::Fast> module).  But the hash can be created in any manner.
 
 Values are checked lazily, so no work is done on parts of the hash that
 are not accessed.
+
+=head1 CREATING A CLASS DEFINITION FROM A JSON BLOB
+
+If you have a file with a JSON blob for which you need to create a class
+definition, you can call the C<bin/skeleton> script.  You call this script
+with the JSON file as the parameter, and it will print a class definition
+on standard output.
+
+Class names will be selected randomly, but will be consistent within the
+definition of the classes.  The order in which classes are defined, is also
+correct for compilation: generally one only needs to globally modify the
+class names to something that makes more sense for the given data.  And
+possibly tweak some standard types into subsets with a more limited range
+of values, e.g. C<Int> to C<UInt>, or C<Str> to C<DateTime(Str)>.
 
 =head1 AUTHOR
 

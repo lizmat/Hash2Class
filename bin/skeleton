@@ -1,0 +1,57 @@
+# Take file with JSON data as a parameter and produces a skeleton
+# of class definitions using the Hash2Class role.  The names of
+# the classes are randomly selected, and once it is known what the
+# real name of the class should be, should be easily globally
+# replaced.
+
+use JSON::Fast;
+use Random::Names;
+
+my $rn = Random::Names.new;
+
+inspect(from-json(slurp));
+
+my %keys2class{Set};
+my %class2keys;
+my @seen;
+
+sub inspect($hash) {
+    my @kv = $hash.kv;
+
+    for @kv -> \key, \value {
+        if value ~~ Hash {
+            $hash{key} = inspect(value);
+        }
+        elsif value ~~ Array {
+            $hash{key}:delete;
+            $hash{"'\@{key}'"} = value[0] ~~ Hash
+             ?? inspect(value[0])
+             !! (value[0]:exists)
+               ?? value[0].^name
+               !! "Any";
+        }
+        else {
+            $hash{key} = value.^name;
+        }
+    }
+
+    my $set = Set.new($hash.keys);
+    my $class-name = %keys2class{$set};
+    unless $class-name {
+        $class-name = %keys2class{$set} = $rn.class-name;
+        @seen.push: $class-name;
+        %class2keys{$class-name} = $hash;
+    }
+
+    $class-name
+}
+
+for @seen {
+    say "class $_ does Hash2Class[";
+
+    my $max = %class2keys{$_}.keys.map(*.chars).max;
+    for %class2keys{$_}.sort(*.key) {
+        say "  {.key}{ " " x ($max - .key.chars) } => {.value},";
+    }
+    say "],";
+}

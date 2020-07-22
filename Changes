@@ -2,6 +2,9 @@ Revision history for Hash2Class
 
 {{$NEXT}}
 
+0.0.3  2020-07-23T00:56:55+02:00
+    - Add bin/skeleton helper script to produce class definitions
+
 0.0.2  2020-07-20T14:07:50+02:00
     - Fixup README.md
 
