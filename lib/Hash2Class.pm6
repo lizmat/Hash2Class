@@ -378,14 +378,13 @@ my sub scalar-hash2class(str $name, $type is raw) {
     }
 }
 
+#---------- the actual role to be mixed in -------------------------------------
+
 # Mapper for valid sigils
 my $sigils := nqp::hash('$', 1, '@', 1, '%', 1);
 
-# The actual role that does the work
 role Hash2Class:ver<0.0.6>:auth<cpan:ELIZABETH>[*@list, *%hash] {
     has $!data;  # the raw data in a Hash
-
-    method !data() is raw { $!data }
 
     # fetch whatever parameters we got
     for (@list, %hash).flat {
