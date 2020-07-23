@@ -390,6 +390,7 @@ role Hash2Class:ver<0.0.6>:auth<cpan:ELIZABETH>[*@list, *%hash] {
     for (@list, %hash).flat {
         my $sigil;
         my $key;
+        my $method;
         my $type;
 
         if $_ ~~ Pair {
@@ -409,11 +410,12 @@ role Hash2Class:ver<0.0.6>:auth<cpan:ELIZABETH>[*@list, *%hash] {
             $sigil := '$';
         }
 
+        $method := $key unless $method;
         die "Key must have a name." unless $key;
-        die "Already has a method called '$key'"
-          if $?CLASS.^methods.first(*.name eq $key);
+        die "Already has a method called '$method'"
+          if $?CLASS.^methods.first(*.name eq $method);
 
-        my $method := nqp::istype($type,Hash2Class)
+        my &method := nqp::istype($type,Hash2Class)
           ?? $sigil eq '$'
             ?? scalar-hash2class($key, $type)  # $
             !! $sigil eq '@'
@@ -431,8 +433,8 @@ role Hash2Class:ver<0.0.6>:auth<cpan:ELIZABETH>[*@list, *%hash] {
                 ?? array-type($key, $type) # @
                 !! hash-type($key, $type); # %
 
-        $method.set_name($key);
-        $?CLASS.^add_method($key, $method);
+        &method.set_name($method);
+        $?CLASS.^add_method($method, &method);
     }
 
     method new(%data) {
