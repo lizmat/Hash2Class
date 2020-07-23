@@ -599,7 +599,7 @@ C<.WHY> function on the method object.
 
 If you have a file with a JSON blob for which you need to create a class
 definition, you can call the C<h2c-skeleton> script.  You call this script
-with the JSON file as the parameter, and it will print a class definition
+with the JSON blob on standard input, and it will print a class definition
 on standard output.
 
 Class names will be selected randomly, but will be consistent within the

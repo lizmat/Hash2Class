@@ -1,4 +1,4 @@
-# Take file with JSON data as a parameter and produces a skeleton
+# Take file with JSON data from STDIN and produce a skeleton
 # of class definitions using the Hash2Class role.  The names of
 # the classes are randomly selected, and once it is known what the
 # real name of the class should be, should be easily globally

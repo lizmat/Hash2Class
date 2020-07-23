@@ -14,9 +14,7 @@
   "provides" : {
     "Hash2Class" : "lib/Hash2Class.pm6"
   },
-  "resources" : [
-    "scripts/h2c-skeleton"
-  ],
+  "resources" : [ ],
   "source-url" : "https://github.com/lizmat/Hash2Class.git",
   "tags" : [
     "JSON",
