@@ -12,6 +12,10 @@ class A does Hash2Class[
   baz        => B,
   '@bazlist' => B,
   '%bazmap'  => B,
+  zap        => {
+    type => Str,
+    name => "zippo",
+  }
 ] { }
 
 my %hash =
@@ -30,13 +34,15 @@ my %hash =
     second => { added => "2020-07-03", changed => "2020-07-04" },
     third  => { added => "2020-07-05", changed => "2020-07-06" },
   },
+  zap => "Groucho",
 ;
 
 my $a = A.new(%hash);
 
 isa-ok $a, A, 'did we get an A';
-is-deeply $a.foo, "foo", 'was foo foo';
-is-deeply $a.bar,    42, 'was bar 42';
+is-deeply $a.foo,       "foo", 'was foo foo';
+is-deeply $a.bar,          42, 'was bar 42';
+is-deeply $a.zippo, 'Groucho', 'was zap / zippo Groucho';
 
 my $b = $a.baz;
 isa-ok $b, B, 'did we get a B';

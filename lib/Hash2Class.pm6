@@ -383,7 +383,7 @@ my sub scalar-hash2class(str $name, $type is raw) {
 # Mapper for valid sigils
 my $sigils := nqp::hash('$', 1, '@', 1, '%', 1);
 
-role Hash2Class:ver<0.0.6>:auth<cpan:ELIZABETH>[*@list, *%hash] {
+role Hash2Class:ver<0.0.7>:auth<cpan:ELIZABETH>[*@list, *%hash] {
     has $!data;  # the raw data in a Hash
 
     # fetch whatever parameters we got
@@ -392,11 +392,35 @@ role Hash2Class:ver<0.0.6>:auth<cpan:ELIZABETH>[*@list, *%hash] {
         my $key;
         my $method;
         my $type;
+        my $why;
 
         if $_ ~~ Pair {
             $sigil := .key.substr(0,1);
             $key   := .key.substr(1);
-            $type  := .value;
+            with .value {
+                if $_ ~~ Map {
+                    with .<type> {
+                        $type := $_ ~~ Str
+                          ?? ::($_)
+                          !! die "Only type objects can be used to indicate type";
+                    }
+                    else {
+                        $type := $_;
+                    }
+
+                    $method := $_ with .<name>;
+                    $why    := $_ with .<why>;
+                }
+                elsif $_ ~~ Str {
+                    $type := ::($_);
+                }
+                else {
+                    die "Unsupported value for key: $_.raku()";
+                }
+            }
+            else {
+                $type := $_;
+            }
         }
         else {
             $sigil := .substr(0,1);
@@ -433,6 +457,7 @@ role Hash2Class:ver<0.0.6>:auth<cpan:ELIZABETH>[*@list, *%hash] {
                 ?? array-type($key, $type) # @
                 !! hash-type($key, $type); # %
 
+        &method.set_why($why) if $why;
         &method.set_name($method);
         $?CLASS.^add_method($method, &method);
     }
@@ -466,11 +491,16 @@ Hash2Class - A role to create class instances out of a Hash
   ] { }
 
   class FBB does Hash2Class[
-    foo        => Str,
+    "foo",
     bar        => Int,
     baz        => UpdateInfo,
     '@bazlist' => UpdateInfo,
     '%bazmap'  => UpdateInfo,
+    zap => {
+      type => Str,
+      name => "zippo",
+      why  => "Because we can",
+    },
   ] { }
 
   my %hash =
@@ -489,11 +519,13 @@ Hash2Class - A role to create class instances out of a Hash
       second => { added => "2020-07-03", changed => "2020-07-04" },
       third  => { added => "2020-07-05", changed => "2020-07-06" },
     },
+    zap => "Groucho",
   ;
 
   my $fbb = FBB.new(%hash);
   dd $fbb.foo;                    # "foo"
   dd $fbb.bar;                    # 42
+  dd $fbb.zippo;                  # "Groucho"
   dd $fbb.bazlist[1].added;       # Date.new("2020-07-01")
   dd $fbb.bazmap<third>.changed;  # Date.new("2020-07-06")
 
@@ -505,7 +537,8 @@ The C<Hash2Class> role allows one to create a class from a parameterization
 of the role.  The parameterization consists of a list of C<Pair>s in which
 the key indicates the name of key in the hash, and the value indicates the
 type the value in the hash is supposed to have, or be coerced to.  The key
-becomes the name of a method accessing that key in the hash.
+becomes the name of a method accessing that key in the hash, unless it is
+overriden in more extensive parameterization.
 
 A key can be prefixed with C<@> to indicate an Array of values in the hash,
 or be prefixed with C<%> to indicate a hash, or C<$> to indicate a scalar
@@ -522,6 +555,45 @@ L<JSON::Fast> module).  But the hash can be created in any manner.
 
 Values are checked lazily, so no work is done on parts of the hash that
 are not accessed.
+
+=head1 PARAMETERIZATION
+
+There are three modes of parameterization:
+
+=item identifier
+
+Just specifying an identifier (a string of a single word), will create a
+method with the same name, and assume the value is a C<Str>.  For example:
+
+  "foo",
+
+=item identifier => type
+
+A pair consisting of an identifier and a type, will create a method with the
+same name as the identifier, and assume the value is constraint by the given
+type.  For example:
+
+  bar => Int,
+
+The type can also be specified as a string if necessary:
+
+  bar => "Int",
+
+=item identifier => { ... }
+
+A pair consisting of an identifier and a C<Hash> with further parameterization
+values.  For instance:
+
+  zap => {
+    type => Str,
+    name => "zippo",
+    why  => "Because we can",
+  },
+
+Three keys are recognized in such as Hash: C<type> (the type to constrain to),
+C<name> (the name to create the method with, useful in case the key conflicts
+with other methods, such as C<new>), and C<why> (to set the contents of the
+C<.WHY> function on the method object.
 
 =head1 CREATING A CLASS DEFINITION FROM A JSON BLOB
 
