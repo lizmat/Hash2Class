@@ -103,7 +103,7 @@ Three keys are recognized in such as Hash: `type` (the type to constrain to), `n
 CREATING A CLASS DEFINITION FROM A JSON BLOB
 ============================================
 
-If you have a file with a JSON blob for which you need to create a class definition, you can call the `h2c-skeleton` script. You call this script with the JSON file as the parameter, and it will print a class definition on standard output.
+If you have a file with a JSON blob for which you need to create a class definition, you can call the `h2c-skeleton` script. You call this script with the JSON blob on standard input, and it will print a class definition on standard output.
 
 Class names will be selected randomly, but will be consistent within the definition of the classes. The order in which classes are defined, is also correct for compilation: generally one only needs to globally modify the class names to something that makes more sense for the given data. And possibly tweak some standard types into subsets with a more limited range of values, e.g. `Int` to `UInt`, or `Str` to `DateTime(Str)`.
 
