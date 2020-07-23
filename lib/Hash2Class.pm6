@@ -389,50 +389,50 @@ role Hash2Class:ver<0.0.6>:auth<cpan:ELIZABETH>[*@list, *%hash] {
     # fetch whatever parameters we got
     for (@list, %hash).flat {
         my $sigil;
-        my $name;
+        my $key;
         my $type;
 
         if $_ ~~ Pair {
             $sigil := .key.substr(0,1);
-            $name  := .key.substr(1);
+            $key   := .key.substr(1);
             $type  := .value;
         }
         else {
             $sigil := .substr(0,1);
-            $name  := .substr(1);
+            $key   := .substr(1);
             $type  := Str;
         }
 
         # fix sigilless names
-        unless nqp::existskey($sigils,$sigil) {
-            $name  := $sigil ~ $name;
+        unless $sigil && nqp::existskey($sigils,$sigil) {
+            $key   := $sigil ~ $key;
             $sigil := '$';
         }
 
-        die "Key must have a name." unless $name;
-        die "Already has a method called '$name'"
-          if $?CLASS.^methods.first(*.name eq $name);
+        die "Key must have a name." unless $key;
+        die "Already has a method called '$key'"
+          if $?CLASS.^methods.first(*.name eq $key);
 
         my $method := nqp::istype($type,Hash2Class)
           ?? $sigil eq '$'
-            ?? scalar-hash2class($name, $type)  # $
+            ?? scalar-hash2class($key, $type)  # $
             !! $sigil eq '@'
-              ?? array-hash2class($name, $type) # @
-              !! hash-hash2class($name, $type)  # %
+              ?? array-hash2class($key, $type) # @
+              !! hash-hash2class($key, $type)  # %
           !! $type.HOW.^name.ends-with('::CoercionHOW')
             ?? $sigil eq '$'
-              ?? scalar-coercer($name, $type)  # $
+              ?? scalar-coercer($key, $type)  # $
               !! $sigil eq '@'
-                ?? array-coercer($name, $type) # @
-                !! hash-coercer($name, $type)  # %
+                ?? array-coercer($key, $type) # @
+                !! hash-coercer($key, $type)  # %
             !! $sigil eq '$'
-              ?? scalar-type($name, $type)  # $
+              ?? scalar-type($key, $type)  # $
               !! $sigil eq '@'
-                ?? array-type($name, $type) # @
-                !! hash-type($name, $type); # %
+                ?? array-type($key, $type) # @
+                !! hash-type($key, $type); # %
 
-        $method.set_name($name);
-        $?CLASS.^add_method($name, $method);
+        $method.set_name($key);
+        $?CLASS.^add_method($key, $method);
     }
 
     method new(%data) {
