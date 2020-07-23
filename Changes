@@ -2,6 +2,9 @@ Revision history for Hash2Class
 
 {{$NEXT}}
 
+0.0.6  2020-07-23T17:14:33+02:00
+    - Argh, forgot to update META6.json
+
 0.0.5  2020-07-23T17:11:59+02:00
     - Rename skeleton to less ambiguous h2c-skeleton
 
