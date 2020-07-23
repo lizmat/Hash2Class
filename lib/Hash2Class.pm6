@@ -447,6 +447,10 @@ role Hash2Class:ver<0.0.6>:auth<cpan:ELIZABETH>[*@list, *%hash] {
     }
 }
 
+sub skeleton() is export {
+    .say for %?RESOURCES<scripts/h2c-skeleton>.open.lines;
+}
+
 =begin pod
 
 =head1 NAME
@@ -525,7 +529,17 @@ are not accessed.
 =head1 CREATING A CLASS DEFINITION FROM A JSON BLOB
 
 If you have a file with a JSON blob for which you need to create a class
-definition, you can call the C<h2c-skeleton> script.  You call this script
+definition, you can call the C<skeleton> script which is available
+by extracting it with the C<skeleton> routine which writes the code
+to C<stdout>:
+
+=begin code
+use Hash2Code;
+skeleton;  # OUTPUT: ...Raku program lines...
+=end code
+
+
+You call this script
 with the JSON file as the parameter, and it will print a class definition
 on standard output.
 
