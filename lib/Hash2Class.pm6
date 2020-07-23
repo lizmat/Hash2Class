@@ -382,7 +382,7 @@ my sub scalar-hash2class(str $name, $type is raw) {
 my $sigils := nqp::hash('$', 1, '@', 1, '%', 1);
 
 # The actual role that does the work
-role Hash2Class:ver<0.0.3>:auth<cpan:ELIZABETH>[*@list, *%hash] {
+role Hash2Class:ver<0.0.4>:auth<cpan:ELIZABETH>[*@list, *%hash] {
     has $!data;  # the raw data in a Hash
 
     method !data() is raw { $!data }
