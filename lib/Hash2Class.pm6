@@ -382,7 +382,7 @@ my sub scalar-hash2class(str $name, $type is raw) {
 my $sigils := nqp::hash('$', 1, '@', 1, '%', 1);
 
 # The actual role that does the work
-role Hash2Class:ver<0.0.4>:auth<cpan:ELIZABETH>[*@list, *%hash] {
+role Hash2Class:ver<0.0.5>:auth<cpan:ELIZABETH>[*@list, *%hash] {
     has $!data;  # the raw data in a Hash
 
     method !data() is raw { $!data }
@@ -525,7 +525,7 @@ are not accessed.
 =head1 CREATING A CLASS DEFINITION FROM A JSON BLOB
 
 If you have a file with a JSON blob for which you need to create a class
-definition, you can call the C<bin/skeleton> script.  You call this script
+definition, you can call the C<h2c-skeleton> script.  You call this script
 with the JSON file as the parameter, and it will print a class definition
 on standard output.
 
