@@ -2,6 +2,10 @@ Revision history for Hash2Class
 
 {{$NEXT}}
 
+0.0.7  2020-07-23T20:34:01+02:00
+    - Add support for more extensive parameterization
+    - Add support for specifying type as a string
+
 0.0.6  2020-07-23T17:14:33+02:00
     - Argh, forgot to update META6.json
 
