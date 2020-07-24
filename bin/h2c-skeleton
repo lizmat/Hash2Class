@@ -47,11 +47,12 @@ sub inspect($hash) {
 }
 
 for @seen {
-    say "class $_ does Hash2Class[";
+    say "our class $_ does Hash2Class[";
 
     my $max = %class2keys{$_}.keys.map(*.chars).max;
     for %class2keys{$_}.sort(*.key) {
         say "  {.key}{ " " x ($max - .key.chars) } => {.value},";
     }
-    say "],";
+    say '] { }';
+    say '';
 }
