@@ -107,6 +107,26 @@ If you have a file with a JSON blob for which you need to create a class definit
 
 Class names will be selected randomly, but will be consistent within the definition of the classes. The order in which classes are defined, is also correct for compilation: generally one only needs to globally modify the class names to something that makes more sense for the given data. And possibly tweak some standard types into subsets with a more limited range of values, e.g. `Int` to `UInt`, or `Str` to `DateTime(Str)`.
 
+METHODS
+=======
+
+new
+---
+
+    my $foo = Foo.new(%hash);
+
+An object of a class that does the `Hash2Class` role, is created by calling the `new` method with a hash of keys and values. Each of these values can be another hash or array: these will be handled automatically if they were so parameterized.
+
+invalid
+-------
+
+    with $foo.invalid {
+        note "Errors found:";
+        dd $_;
+    }
+
+The `invalid` method either returns `Nil` if all values in the hash where valid. Otherwise it returns a hash of error messages of which the keys are the names of the `methods`, and the values are the error messages. Please note that this check will access *all* values in the hash, so it may take some time for big hashes.
+
 AUTHOR
 ======
 
