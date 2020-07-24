@@ -3,6 +3,10 @@
 
 use nqp;
 
+sub wrongtype(Mu $got, Mu $expected) {
+    X::TypeCheck.new(operation => "fetching", :$got, :$expected).throw
+}
+
 #---------- support for handling arrays in the original hash -------------------
 
 # Class to replace original Array with a List with objectification
@@ -63,10 +67,7 @@ my sub array-type(str $name, \type) is raw {
                Hash2Class::List.new($list, -> \value {
                    nqp::istype(value,type)
                      ?? nqp::decont(value)
-                     !! X::TypeCheck.new(
-                          got      => value,
-                          expected => type,
-                        ).throw
+                     !! wrongtype(value, type)
                })
              )
           !! $list
@@ -92,14 +93,8 @@ my sub array-coercer(str $name, \type) {
                        nqp::istype($value,constraint)
                          ?? nqp::istype(($value := $value."$typename"()),target)
                            ?? $value
-                           !! X::TypeCheck.new(
-                                got      => $value,
-                                expected => target,
-                              ).throw
-                         !! X::TypeCheck.new(
-                              got      => $value,
-                              expected => constraint,
-                            ).throw
+                           !! wrongtype($value, target)
+                         !! wrongtype($value, constraint)
                    })
                  )
               !! $list
@@ -119,10 +114,7 @@ my sub array-coercer(str $name, \type) {
                    Hash2Class::List.new($list, -> \value {
                        nqp::istype(value,constraint)
                          ?? value."$typename"()
-                         !! X::TypeCheck.new(
-                              got      => value,
-                              expected => constraint,
-                            ).throw
+                         !! wrongtype(value, constraint)
                    })
                  )
               !! $list
@@ -204,10 +196,7 @@ my sub hash-type(str $name, \type) is raw {
                Hash2Class::Map.new($map, -> \value {
                    nqp::istype(value,type)
                      ?? nqp::decont(value)
-                     !! X::TypeCheck.new(
-                          got      => value,
-                          expected => type,
-                        ).throw
+                     !! wrongtype(value, type)
                })
              )
           !! $map
@@ -233,14 +222,8 @@ my sub hash-coercer(str $name, \type) {
                        nqp::istype($value,constraint)
                          ?? nqp::istype(($value := $value."$typename"()),target)
                            ?? $value
-                           !! X::TypeCheck.new(
-                                got      => $value,
-                                expected => target,
-                              ).throw
-                         !! X::TypeCheck.new(
-                              got      => $value,
-                              expected => constraint,
-                            ).throw
+                           !! wrongtype($value, target)
+                         !! wrongtype($value, constraint)
                    })
                  )
               !! $map
@@ -260,10 +243,7 @@ my sub hash-coercer(str $name, \type) {
                    Hash2Class::Map.new($map, -> \value {
                        nqp::istype(value,constraint)
                          ?? value."$typename"()
-                         !! X::TypeCheck.new(
-                              got      => value,
-                              expected => constraint,
-                            ).throw
+                         !! wrongtype(value, constraint)
                    })
                  )
               !! $map
@@ -300,10 +280,7 @@ my sub scalar-type(str $name, $type is raw) {
                  $name,
                  nqp::decont($value)
                )
-            !! X::TypeCheck.new(
-                 got      => $value,
-                 expected => $type,
-               ).throw
+            !! wrongtype($value, $type)
           !! $value
     }
 }
@@ -329,14 +306,8 @@ my sub scalar-coercer(str $name, \type) {
                        $name,
                        $value
                      )
-                  !! X::TypeCheck.new(
-                       got      => $value,
-                       expected => target,
-                     ).throw
-                !! X::TypeCheck.new(
-                     got      => $value,
-                     expected => constraint,
-                   ).throw
+                  !! wrongtype($value, target)
+                !! wrongtype($value, constraint)
               !! $value
         }
     }
@@ -355,10 +326,7 @@ my sub scalar-coercer(str $name, \type) {
                      $name,
                      $value."$typename"()
                    )
-                !! X::TypeCheck.new(
-                     got      => $value,
-                     expected => constraint,
-                   ).throw
+                !! wrongtype($value, constraint)
               !! $value
         }
     }
@@ -466,6 +434,73 @@ role Hash2Class:ver<0.0.8>:auth<cpan:ELIZABETH>[*@list, *%hash] {
         nqp::p6bindattrinvres(
           nqp::create(self),self,'$!data',nqp::getattr(%data,Map,'$!storage')
         )
+    }
+
+    my constant $skip := nqp::hash('new',1,'invalid',1,'raku',1,'BUILDALL',1);
+
+    method invalid() {
+        my $sorries := nqp::hash;
+
+        for self.^methods -> &method {
+            my $name := &method.name;
+            next if nqp::existskey($skip,$name);
+
+            my $result := try method(self);
+            if nqp::eqaddr($result,Nil) {
+                nqp::bindkey($sorries,$name,$!.message);
+            }
+
+            elsif nqp::istype($result,Hash2Class) {
+                my $invalid := $result.invalid;
+                nqp::bindkey($sorries,$name,$invalid) if $invalid;
+            }
+
+            elsif nqp::istype($result,Hash2Class::List) {
+                my $list-sorries := nqp::create(IterationBuffer);
+                my int $elems = $result.elems;
+                my int $i     = -1;
+
+                nqp::while(
+                  nqp::islt_i(($i = nqp::add_i($i,1)),$elems),
+                  nqp::if(
+                    nqp::istype((my $val := $result.AT-POS($i)),Hash2Class),
+                    nqp::unless(
+                      nqp::eqaddr((my $invalid := $val.invalid),Nil),
+                      nqp::bindpos($list-sorries,$i,$invalid)
+                    )
+                  )
+                );
+                nqp::bindkey($sorries,$name,$list-sorries.List)
+                  if nqp::elems($list-sorries);
+            }
+
+            elsif nqp::istype($result,Hash2Class::Map) {
+                my $map-sorries := nqp::hash;
+                my $iter :=
+                  nqp::iterator(nqp::getattr($result,Map,'$!storage'));
+
+                nqp::while(
+                  $iter,
+                  nqp::stmts(
+                    (my str $key = nqp::iterkey_s(nqp::shift($iter))),
+                    nqp::if(
+                      nqp::istype(
+                        (my $val := $result.AT-KEY($key)),
+                        Hash2Class
+                      ),
+                      nqp::unless(
+                        nqp::eqaddr((my $invalid := $val.invalid),Nil),
+                        nqp::bindkey($map-sorries,$key,$invalid)
+                      )
+                    )
+                  )
+                );
+                nqp::bindkey($sorries,$name,nqp::hllize($map-sorries))
+                  if nqp::elems($map-sorries);
+            }
+        }
+
+        nqp::elems($sorries) ?? $sorries !! Nil
     }
 
     method raku() {
@@ -608,6 +643,30 @@ correct for compilation: generally one only needs to globally modify the
 class names to something that makes more sense for the given data.  And
 possibly tweak some standard types into subsets with a more limited range
 of values, e.g. C<Int> to C<UInt>, or C<Str> to C<DateTime(Str)>.
+
+=head1 METHODS
+
+=head2 new
+
+  my $foo = Foo.new(%hash);
+
+An object of a class that does the C<Hash2Class> role, is created by calling
+the C<new> method with a hash of keys and values.  Each of these values can
+be another hash or array: these will be handled automatically if they were
+so parameterized.
+
+=head2 invalid
+
+  with $foo.invalid {
+      note "Errors found:";
+      dd $_;
+  }
+
+The C<invalid> method either returns C<Nil> if all values in the hash where
+valid.  Otherwise it returns a hash of error messages of which the keys are
+the names of the C<methods>, and the values are the error messages.  Please
+note that this check will access *all* values in the hash, so it may take
+some time for big hashes.
 
 =head1 AUTHOR
 

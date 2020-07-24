@@ -7,7 +7,7 @@ class B does Hash2Class[
 ] { }
 
 class A does Hash2Class[
-  foo        => Str,
+  "foo",
   bar        => Int(Str),
   baz        => B,
   '@bazlist' => B,
@@ -18,7 +18,7 @@ class A does Hash2Class[
   }
 ] { }
 
-my %hash =
+my %valid =
   foo => "foo",
   bar => "42",
   baz => {
@@ -37,12 +37,13 @@ my %hash =
   zap => "Groucho",
 ;
 
-my $a = A.new(%hash);
+my $a = A.new(%valid);
 
 isa-ok $a, A, 'did we get an A';
 is-deeply $a.foo,       "foo", 'was foo foo';
 is-deeply $a.bar,          42, 'was bar 42';
 is-deeply $a.zippo, 'Groucho', 'was zap / zippo Groucho';
+is-deeply $a.invalid, Nil, 'is A valid';
 
 my $b = $a.baz;
 isa-ok $b, B, 'did we get a B';
@@ -69,5 +70,54 @@ is-deeply $bm<second>.changed, "2020-07-04".Date, 'did we get 2020-07-04 as Date
 isa-ok $bm<third>, B, 'did we get a B';
 is-deeply $bm<third>.added,   "2020-07-05".Date, 'did we get 2020-07-05 as Date';
 is-deeply $bm<third>.changed, "2020-07-06".Date, 'did we get 2020-07-06 as Date';
+
+my %invalid =
+  foo => 42,
+  bar => "foo",
+  baz => {
+    added   => "v2020-07-18",
+    changed => "v2020-07-19",
+  },
+  bazlist => [
+    { added => "v2020-07-14", changed => "v2020-07-15" },
+    { added => "v2020-07-16", changed => "v2020-07-17" },
+  ],
+  bazmap => {
+    first  => { added => "v2020-07-01", changed => "v2020-07-02" },
+    second => { added => "v2020-07-03", changed => "v2020-07-04" },
+    third  => { added => "v2020-07-05", changed => "v2020-07-06" },
+  },
+  zap => 666,
+;
+
+my $c = A.new(%invalid);
+isa-ok $c, A, 'did we get an A';
+
+my $invalid = $c.invalid;
+isa-ok $invalid, Hash, 'did we get a hash with errors';
+diag $invalid<foo> unless
+  ok $invalid<foo>.contains("expected Str but got Int"),
+    'is error message for foo correct';
+diag $invalid<bar> unless
+  ok $invalid<bar>.contains("Cannot convert string to number"),
+    'is error message for bar correct';
+diag $invalid<zippo> unless
+  ok $invalid<zippo>.contains("expected Str but got Int"),
+    'is error message for zippo correct';
+
+my @bl := $invalid<bazlist>;
+isa-ok $bl, List, 'did we get a list with errors';
+my %bm := $invalid<bazmap>;
+isa-ok $bm,  Map, 'did we get a map with errors';
+
+for |@bl,|%bm.values {
+    diag .<added> unless
+      ok .<added>.contains("Invalid Date string"),
+        'did we get invalid Date error for added';
+    diag .<changed> unless
+      ok .<changed>.contains("Invalid Date string"),
+        'did we get invalid Date error for changed';
+}
+
 
 done-testing;
