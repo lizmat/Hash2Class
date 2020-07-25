@@ -591,39 +591,57 @@ L<JSON::Fast> module).  But the hash can be created in any manner.
 Values are checked lazily, so no work is done on parts of the hash that
 are not accessed.
 
+=head1 WHY
+
+Hashes can be filled in many ways: JSON just being one of them.  And data is
+not always as clean as you would hope they would be.  This role allows you
+to add lazy typechecking to such a hash of data.  It also prevents problems
+caused by spelling errors in keys in your code: instead of silently returning
+C<Nil>, you will get a "Method not found" error on misspelled method names.
+
+Since the type checking occurs lazily, no CPU is spent on typechecking values
+you do not actually need.  Should you do want to have complete typechecking
+on all keys / values in the hash, then you can call the C<.invalid> method
+on the object: this will visit B<all> values in the hash recursively and
+produce a corresponding hash of any errors found, or C<Nil> if all is ok.
+
 =head1 PARAMETERIZATION
 
 There are three modes of parameterization:
 
 =item identifier
 
-Just specifying an identifier (a string of a single word), will create a
-method with the same name, and assume the value is a C<Str>.  For example:
-
   "foo",
+
+Just specifying an identifier (a string of a single word), will create a
+method with the same name, and assume the value is a C<Str>.
 
 =item identifier => type
 
+  bar => Int,
+
 A pair consisting of an identifier and a type, will create a method with the
 same name as the identifier, and assume the value is constraint by the given
-type.  For example:
-
-  bar => Int,
+type.
 
 The type can also be specified as a string if necessary:
 
   bar => "Int",
 
-=item identifier => { ... }
+Coercing types are also supported:
 
-A pair consisting of an identifier and a C<Hash> with further parameterization
-values.  For instance:
+  bar => Int(Str),
+
+=item identifier => { ... }
 
   zap => {
     type => Str,
     name => "zippo",
     why  => "Because we can",
   },
+
+A pair consisting of an identifier and a C<Hash> with further parameterization
+values.
 
 Three keys are recognized in such as Hash: C<type> (the type to constrain to),
 C<name> (the name to create the method with, useful in case the key conflicts
