@@ -70,7 +70,7 @@ my sub array-type(str $name, \type) is raw {
                      !! wrongtype(value, type)
                })
              )
-          !! $list
+          !! nqp::ifnull($list,Nil)
     }
 }
 
@@ -97,7 +97,7 @@ my sub array-coercer(str $name, \type) {
                          !! wrongtype($value, constraint)
                    })
                  )
-              !! $list
+              !! nqp::ifnull($list,Nil)
         }
     }
 
@@ -117,7 +117,7 @@ my sub array-coercer(str $name, \type) {
                          !! wrongtype(value, constraint)
                    })
                  )
-              !! $list
+              !! nqp::ifnull($list,Nil)
         }
     }
 }
@@ -134,7 +134,7 @@ my sub array-hash2class(str $name, \type) is raw {
                    type.new(value)
                })
              )
-          !! $list
+          !! nqp::ifnull($list,Nil)
     }
 }
 
@@ -226,7 +226,7 @@ my sub hash-coercer(str $name, \type) {
                          !! wrongtype($value, constraint)
                    })
                  )
-              !! $map
+              !! nqp::ifnull($map,Nil)
         }
     }
 
@@ -246,7 +246,7 @@ my sub hash-coercer(str $name, \type) {
                          !! wrongtype(value, constraint)
                    })
                  )
-              !! $map
+              !! nqp::ifnull($map,Nil)
         }
     }
 }
@@ -263,7 +263,7 @@ my sub hash-hash2class(str $name, \type) is raw {
                    type.new(value)
                })
              )
-          !! $map
+          !! nqp::ifnull($map,Nil)
     }
 }
 
@@ -281,7 +281,7 @@ my sub scalar-type(str $name, $type is raw) {
                  nqp::decont($value)
                )
             !! wrongtype($value, $type)
-          !! $value
+          !! nqp::ifnull($value,Nil)
     }
 }
 
@@ -308,7 +308,7 @@ my sub scalar-coercer(str $name, \type) {
                      )
                   !! wrongtype($value, target)
                 !! wrongtype($value, constraint)
-              !! $value
+              !! nqp::ifnull($value,Nil)
         }
     }
     
@@ -327,7 +327,7 @@ my sub scalar-coercer(str $name, \type) {
                      $value."$typename"()
                    )
                 !! wrongtype($value, constraint)
-              !! $value
+              !! nqp::ifnull($value,Nil)
         }
     }
 }
@@ -342,7 +342,7 @@ my sub scalar-hash2class(str $name, $type is raw) {
                $name,
                $type.new($value)
              )
-          !! $value
+          !! nqp::ifnull($value,Nil)
     }
 }
 
@@ -351,7 +351,7 @@ my sub scalar-hash2class(str $name, $type is raw) {
 # Mapper for valid sigils
 my $sigils := nqp::hash('$', 1, '@', 1, '%', 1);
 
-role Hash2Class:ver<0.1.0>:auth<cpan:ELIZABETH>[*@list, *%hash] {
+role Hash2Class:ver<0.1.1>:auth<cpan:ELIZABETH>[*@list, *%hash] {
     has $!data;  # the raw data in a Hash
 
     # fetch whatever parameters we got

@@ -2,6 +2,9 @@ Revision history for Hash2Class
 
 {{$NEXT}}
 
+0.1.1  2020-07-31T00:17:05+02:00
+    - Make sure non-existing keys return Nil instead of Mu
+
 0.1.0  2020-07-24T23:26:15+02:00
     - Fix h2c-skeleton output
 

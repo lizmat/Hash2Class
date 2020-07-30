@@ -67,6 +67,13 @@ Classes made with the `Hash2Class` role are instantiated by calling `.new` with 
 
 Values are checked lazily, so no work is done on parts of the hash that are not accessed.
 
+WHY
+===
+
+Hashes can be filled in many ways: JSON just being one of them. And data is not always as clean as you would hope they would be. This role allows you to add lazy typechecking to such a hash of data. It also prevents problems caused by spelling errors in keys in your code: instead of silently returning `Nil`, you will get a "Method not found" error on misspelled method names.
+
+Since the type checking occurs lazily, no CPU is spent on typechecking values you do not actually need. Should you do want to have complete typechecking on all keys / values in the hash, then you can call the `.invalid` method on the object: this will visit **all** values in the hash recursively and produce a corresponding hash of any errors found, or `Nil` if all is ok.
+
 PARAMETERIZATION
 ================
 
@@ -74,29 +81,33 @@ There are three modes of parameterization:
 
   * identifier
 
-Just specifying an identifier (a string of a single word), will create a method with the same name, and assume the value is a `Str`. For example:
-
     "foo",
+
+Just specifying an identifier (a string of a single word), will create a method with the same name, and assume the value is a `Str`.
 
   * identifier => type
 
-A pair consisting of an identifier and a type, will create a method with the same name as the identifier, and assume the value is constraint by the given type. For example:
-
     bar => Int,
+
+A pair consisting of an identifier and a type, will create a method with the same name as the identifier, and assume the value is constraint by the given type.
 
 The type can also be specified as a string if necessary:
 
     bar => "Int",
 
-  * identifier => { ... }
+Coercing types are also supported:
 
-A pair consisting of an identifier and a `Hash` with further parameterization values. For instance:
+    bar => Int(Str),
+
+  * identifier => { ... }
 
     zap => {
       type => Str,
       name => "zippo",
       why  => "Because we can",
     },
+
+A pair consisting of an identifier and a `Hash` with further parameterization values.
 
 Three keys are recognized in such as Hash: `type` (the type to constrain to), `name` (the name to create the method with, useful in case the key conflicts with other methods, such as `new`), and `why` (to set the contents of the `.WHY` function on the method object.
 
