@@ -2,6 +2,9 @@ Revision history for Hash2Class
 
 {{$NEXT}}
 
+0.1.2  2020-07-31T12:02:18+02:00
+    - Introduce "default" key to set default value instead of Nil
+
 0.1.1  2020-07-31T00:17:05+02:00
     - Make sure non-existing keys return Nil instead of Mu
 

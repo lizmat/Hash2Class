@@ -57,7 +57,7 @@ my class Hash2Class::List is List {
 }
 
 # Returns method for checking elements of an array
-my sub array-type(str $name, \type) is raw {
+my sub array-type(str $name, \type, \default) is raw {
     method () is raw {
         nqp::iscont(
           my $list := nqp::atkey(nqp::getattr(self,self.WHAT,'$!data'),$name)
@@ -70,12 +70,12 @@ my sub array-type(str $name, \type) is raw {
                      !! wrongtype(value, type)
                })
              )
-          !! nqp::ifnull($list,Nil)
+          !! nqp::ifnull($list,default)
     }
 }
 
 # Returns method for handling array with a coercer
-my sub array-coercer(str $name, \type) {
+my sub array-coercer(str $name, \type, \default) {
     my \target      := type.^target_type;
     my \constraint  := type.^constraint_type;
 
@@ -97,7 +97,7 @@ my sub array-coercer(str $name, \type) {
                          !! wrongtype($value, constraint)
                    })
                  )
-              !! nqp::ifnull($list,Nil)
+              !! nqp::ifnull($list,default)
         }
     }
 
@@ -117,13 +117,13 @@ my sub array-coercer(str $name, \type) {
                          !! wrongtype(value, constraint)
                    })
                  )
-              !! nqp::ifnull($list,Nil)
+              !! nqp::ifnull($list,default)
         }
     }
 }
 
 # Return sub for converting hash to object
-my sub array-hash2class(str $name, \type) is raw {
+my sub array-hash2class(str $name, \type, \default) is raw {
     method () is raw {
         nqp::iscont(
           my $list := nqp::atkey(nqp::getattr(self,self.WHAT,'$!data'),$name)
@@ -134,7 +134,7 @@ my sub array-hash2class(str $name, \type) is raw {
                    type.new(value)
                })
              )
-          !! nqp::ifnull($list,Nil)
+          !! nqp::ifnull($list,default)
     }
 }
 
@@ -186,7 +186,7 @@ my class Hash2Class::Map is Map {
 }
 
 # Returns method for checking keys of a hash
-my sub hash-type(str $name, \type) is raw {
+my sub hash-type(str $name, \type, \default) is raw {
     method () is raw {
         nqp::iscont(
           my $map := nqp::atkey(nqp::getattr(self,self.WHAT,'$!data'),$name)
@@ -199,12 +199,12 @@ my sub hash-type(str $name, \type) is raw {
                      !! wrongtype(value, type)
                })
              )
-          !! $map
+          !! nqp::ifnull($map,default)
     }
 }
 
 # Returns method for handling hash with a coercer
-my sub hash-coercer(str $name, \type) {
+my sub hash-coercer(str $name, \type, \default) {
     my \target      := type.^target_type;
     my \constraint  := type.^constraint_type;
 
@@ -226,7 +226,7 @@ my sub hash-coercer(str $name, \type) {
                          !! wrongtype($value, constraint)
                    })
                  )
-              !! nqp::ifnull($map,Nil)
+              !! nqp::ifnull($map,default)
         }
     }
 
@@ -246,13 +246,13 @@ my sub hash-coercer(str $name, \type) {
                          !! wrongtype(value, constraint)
                    })
                  )
-              !! nqp::ifnull($map,Nil)
+              !! nqp::ifnull($map,default)
         }
     }
 }
 
 # Return sub for converting hash to object
-my sub hash-hash2class(str $name, \type) is raw {
+my sub hash-hash2class(str $name, \type, \default) is raw {
     method () is raw {
         nqp::iscont(
           my $map := nqp::atkey(nqp::getattr(self,self.WHAT,'$!data'),$name)
@@ -263,14 +263,14 @@ my sub hash-hash2class(str $name, \type) is raw {
                    type.new(value)
                })
              )
-          !! nqp::ifnull($map,Nil)
+          !! nqp::ifnull($map,default)
     }
 }
 
 #---------- support for handling scalars in the original hash ------------------
 
 # Returns method for handling a simple typecheck
-my sub scalar-type(str $name, $type is raw) {
+my sub scalar-type(str $name, $type is raw, \default) {
     method () is raw {
         nqp::iscont(
           my $value := nqp::atkey(nqp::getattr(self,self.WHAT,'$!data'),$name)
@@ -281,12 +281,12 @@ my sub scalar-type(str $name, $type is raw) {
                  nqp::decont($value)
                )
             !! wrongtype($value, $type)
-          !! nqp::ifnull($value,Nil)
+          !! nqp::ifnull($value,default)
     }
 }
 
 # Returns method for handling a simple coercer
-my sub scalar-coercer(str $name, \type) {
+my sub scalar-coercer(str $name, \type,\default) {
     my \target      := type.^target_type;
     my \constraint  := type.^constraint_type;
     my $method;
@@ -308,7 +308,7 @@ my sub scalar-coercer(str $name, \type) {
                      )
                   !! wrongtype($value, target)
                 !! wrongtype($value, constraint)
-              !! nqp::ifnull($value,Nil)
+              !! nqp::ifnull($value,default)
         }
     }
     
@@ -327,13 +327,13 @@ my sub scalar-coercer(str $name, \type) {
                      $value."$typename"()
                    )
                 !! wrongtype($value, constraint)
-              !! nqp::ifnull($value,Nil)
+              !! nqp::ifnull($value,default)
         }
     }
 }
 
 # Returns method for handling a Hash2Class class
-my sub scalar-hash2class(str $name, $type is raw) {
+my sub scalar-hash2class(str $name, $type is raw, \default) {
     method () is raw {
         nqp::iscont(
           my $value := nqp::atkey(nqp::getattr(self,self.WHAT,'$!data'),$name)
@@ -342,7 +342,7 @@ my sub scalar-hash2class(str $name, $type is raw) {
                $name,
                $type.new($value)
              )
-          !! nqp::ifnull($value,Nil)
+          !! nqp::ifnull($value,default)
     }
 }
 
@@ -351,7 +351,7 @@ my sub scalar-hash2class(str $name, $type is raw) {
 # Mapper for valid sigils
 my $sigils := nqp::hash('$', 1, '@', 1, '%', 1);
 
-role Hash2Class:ver<0.1.1>:auth<cpan:ELIZABETH>[*@list, *%hash] {
+role Hash2Class:ver<0.1.2>:auth<cpan:ELIZABETH>[*@list, *%hash] {
     has $!data;  # the raw data in a Hash
 
     # fetch whatever parameters we got
@@ -361,6 +361,7 @@ role Hash2Class:ver<0.1.1>:auth<cpan:ELIZABETH>[*@list, *%hash] {
         my $method;
         my $type;
         my $why;
+        my $default := Nil;
 
         if $_ ~~ Pair {
             $sigil := .key.substr(0,1);
@@ -376,8 +377,9 @@ role Hash2Class:ver<0.1.1>:auth<cpan:ELIZABETH>[*@list, *%hash] {
                         $type := $_;
                     }
 
-                    $method := $_ with .<name>;
-                    $why    := $_ with .<why>;
+                    $method  := $_ with .<name>;
+                    $why     := $_ with .<why>;
+                    $default := .<default> if .<default>:exists;
                 }
                 elsif $_ ~~ Str {
                     $type := ::($_);
@@ -402,6 +404,12 @@ role Hash2Class:ver<0.1.1>:auth<cpan:ELIZABETH>[*@list, *%hash] {
             $sigil := '$';
         }
 
+        # sane default?
+        unless $default =:= Nil {
+            die "Default '$default.raku()' does not match '$type.raku()' for '$key'"
+              unless $default ~~ $type;
+        }
+
         $method := $key unless $method;
         die "Key must have a name." unless $key;
         die "Already has a method called '$method'"
@@ -409,21 +417,21 @@ role Hash2Class:ver<0.1.1>:auth<cpan:ELIZABETH>[*@list, *%hash] {
 
         my &method := nqp::istype($type,Hash2Class)
           ?? $sigil eq '$'
-            ?? scalar-hash2class($key, $type)  # $
+            ?? scalar-hash2class($key, $type, $default)  # $
             !! $sigil eq '@'
-              ?? array-hash2class($key, $type) # @
-              !! hash-hash2class($key, $type)  # %
+              ?? array-hash2class($key, $type, $default) # @
+              !! hash-hash2class($key, $type, $default)  # %
           !! $type.HOW.^name.ends-with('::CoercionHOW')
             ?? $sigil eq '$'
-              ?? scalar-coercer($key, $type)  # $
+              ?? scalar-coercer($key, $type, $default)  # $
               !! $sigil eq '@'
-                ?? array-coercer($key, $type) # @
-                !! hash-coercer($key, $type)  # %
+                ?? array-coercer($key, $type, $default) # @
+                !! hash-coercer($key, $type, $default)  # %
             !! $sigil eq '$'
-              ?? scalar-type($key, $type)  # $
+              ?? scalar-type($key, $type, $default)  # $
               !! $sigil eq '@'
-                ?? array-type($key, $type) # @
-                !! hash-type($key, $type); # %
+                ?? array-type($key, $type, $default) # @
+                !! hash-type($key, $type, $default); # %
 
         &method.set_why($why) if $why;
         &method.set_name($method);
@@ -635,18 +643,20 @@ Coercing types are also supported:
 =item identifier => { ... }
 
   zap => {
-    type => Str,
-    name => "zippo",
-    why  => "Because we can",
+    type    => Str,
+    name    => "zippo",
+    default => "(none)",
+    why     => "Because we can",
   },
 
 A pair consisting of an identifier and a C<Hash> with further parameterization
 values.
 
-Three keys are recognized in such as Hash: C<type> (the type to constrain to),
+Four keys are recognized in such as Hash: C<type> (the type to constrain to),
 C<name> (the name to create the method with, useful in case the key conflicts
-with other methods, such as C<new>), and C<why> (to set the contents of the
-C<.WHY> function on the method object.
+with other methods, such as C<new>), C<default> to indicate a default value
+(defaults to C<Nil>) and C<why> (to set the contents of the C<.WHY> function
+on the method object.
 
 =head1 CREATING A CLASS DEFINITION FROM A JSON BLOB
 

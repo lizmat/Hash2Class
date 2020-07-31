@@ -102,14 +102,15 @@ Coercing types are also supported:
   * identifier => { ... }
 
     zap => {
-      type => Str,
-      name => "zippo",
-      why  => "Because we can",
+      type    => Str,
+      name    => "zippo",
+      default => "(none)",
+      why     => "Because we can",
     },
 
 A pair consisting of an identifier and a `Hash` with further parameterization values.
 
-Three keys are recognized in such as Hash: `type` (the type to constrain to), `name` (the name to create the method with, useful in case the key conflicts with other methods, such as `new`), and `why` (to set the contents of the `.WHY` function on the method object.
+Four keys are recognized in such as Hash: `type` (the type to constrain to), `name` (the name to create the method with, useful in case the key conflicts with other methods, such as `new`), `default` to indicate a default value (defaults to `Nil`) and `why` (to set the contents of the `.WHY` function on the method object.
 
 CREATING A CLASS DEFINITION FROM A JSON BLOB
 ============================================

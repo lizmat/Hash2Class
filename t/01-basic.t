@@ -13,8 +13,9 @@ class A does Hash2Class[
   '@bazlist' => B,
   '%bazmap'  => B,
   zap        => {
-    type => Str,
-    name => "zippo",
+    type    => Str,
+    name    => "zippo",
+    default => "(none)",
   }
 ] { }
 
@@ -34,7 +35,6 @@ my %valid =
     second => { added => "2020-07-03", changed => "2020-07-04" },
     third  => { added => "2020-07-05", changed => "2020-07-06" },
   },
-  zap => "Groucho",
 ;
 
 my $a = A.new(%valid);
@@ -42,7 +42,7 @@ my $a = A.new(%valid);
 isa-ok $a, A, 'did we get an A';
 is-deeply $a.foo,       "foo", 'was foo foo';
 is-deeply $a.bar,          42, 'was bar 42';
-is-deeply $a.zippo, 'Groucho', 'was zap / zippo Groucho';
+is-deeply $a.zippo, '(none)', 'was zap / zippo (none)';
 is-deeply $a.invalid, Nil, 'is A valid';
 
 my $b = $a.baz;
