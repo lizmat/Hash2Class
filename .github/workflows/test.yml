@@ -17,14 +17,12 @@ jobs:
           - macOS-latest
           - windows-latest
         raku-version:
-          - '2020.06'
+          - 'latest'
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - uses: Raku/setup-raku@v1
         with:
           raku-version: ${{ matrix.raku-version }}
-      - name: Show Version
-        run: raku --version
       - name: Run Tests
-        run: raku -Ilib t/01-basic.t
+        run: raku run-tests
