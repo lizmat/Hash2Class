@@ -36,9 +36,9 @@ my class Hash2Class::List is List {
               !! IterationEnd
         }
     }
-    method iterator() { Atposerator.new(self) }
+    method iterator(::?CLASS:D:) { Atposerator.new(self) }
 
-    method AT-POS(int $pos) {
+    method AT-POS(::?CLASS:D: int $pos) {
         nqp::islt_i($pos,0)
           ?? Failure.new(X::OutOfRange.new(
                :what<Index>,
@@ -51,7 +51,7 @@ my class Hash2Class::List is List {
                  &!objectifier($value))
             !! nqp::ifnull($value,Nil)
     }
-    method ASSIGN-POS(int $pos, $value) {
+    method ASSIGN-POS(::?CLASS:D: int $pos, $value) {
         X::Assignment::RO.new(:$value).throw
     }
 }
@@ -171,16 +171,16 @@ my class Hash2Class::Map is Map {
               !! IterationEnd
         }
     }
-    method iterator() { Atkeyerator.new(self) }
+    method iterator(::?CLASS:D:) { Atkeyerator.new(self) }
 
-    method AT-KEY(str $key) {
+    method AT-KEY(::?CLASS:D: str $key) {
         nqp::iscont(
           my $value := nqp::atkey(nqp::getattr(self,Map,'$!storage'),$key)
         ) ?? nqp::bindkey(nqp::getattr(self,Map,'$!storage'),$key,
                &!objectifier($value))
           !! nqp::ifnull($value,Nil)
     }
-    method ASSIGN-KEY(str $key, $value) {
+    method ASSIGN-KEY(::?CLASS:D: str $key, $value) {
         X::Assignment::RO.new(:$value).throw
     }
 }
@@ -351,7 +351,7 @@ my sub scalar-hash2class(str $name, $type is raw, \default) {
 # Mapper for valid sigils
 my $sigils := nqp::hash('$', 1, '@', 1, '%', 1);
 
-role Hash2Class:ver<0.1.2>:auth<cpan:ELIZABETH>[*@list, *%hash] {
+role Hash2Class:ver<0.1.3>:auth<cpan:ELIZABETH>[*@list, *%hash] {
     has $!data;  # the raw data in a Hash
 
     # fetch whatever parameters we got
@@ -446,7 +446,7 @@ role Hash2Class:ver<0.1.2>:auth<cpan:ELIZABETH>[*@list, *%hash] {
 
     my constant $skip := nqp::hash('new',1,'invalid',1,'raku',1,'BUILDALL',1);
 
-    method invalid() {
+    method invalid(::?CLASS:D:) {
         my $sorries := nqp::hash;
 
         for self.^methods -> &method {
@@ -511,7 +511,7 @@ role Hash2Class:ver<0.1.2>:auth<cpan:ELIZABETH>[*@list, *%hash] {
         nqp::elems($sorries) ?? $sorries !! Nil
     }
 
-    method raku() {
+    method raku(::?CLASS:D:) {
         $?CLASS.^name ~ '.new(' ~ nqp::hllize($!data).raku ~ ')'
     }
 }
@@ -705,7 +705,7 @@ Pull Requests are welcome.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2020 Elizabeth Mattijsen
+Copyright 2020,2021 Elizabeth Mattijsen
 
 This library is free software; you can redistribute it and/or modify it under
 the Artistic License 2.0.

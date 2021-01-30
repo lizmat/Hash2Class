@@ -1,3 +1,5 @@
+[![Actions Status](https://github.com/lizmat/Hash2Class/workflows/test/badge.svg)](https://github.com/lizmat/Hash2Class/actions)
+
 NAME
 ====
 
@@ -149,7 +151,7 @@ Source can be located at: https://github.com/lizmat/Hash2Class . Comments and Pu
 COPYRIGHT AND LICENSE
 =====================
 
-Copyright 2020 Elizabeth Mattijsen
+Copyright 2020,2021 Elizabeth Mattijsen
 
 This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
 
