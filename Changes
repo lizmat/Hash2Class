@@ -2,6 +2,11 @@ Revision history for Hash2Class
 
 {{$NEXT}}
 
+0.1.4  2021-09-09T23:56:31+02:00
+    - Change file extension to .rakumod
+    - Migrate to zef ecosystem
+    - Update email address
+
 0.1.3  2021-01-30T13:43:18+01:00
     - Make sure methods only take instances
     - Update copyright year
