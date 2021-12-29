@@ -2,6 +2,9 @@ Revision history for Hash2Class
 
 {{$NEXT}}
 
+0.1.5  2021-12-29T21:52:56+01:00
+    - Fix issue with calling .raku on classes made with Hash2Class
+
 0.1.4  2021-09-09T23:56:31+02:00
     - Change file extension to .rakumod
     - Migrate to zef ecosystem
