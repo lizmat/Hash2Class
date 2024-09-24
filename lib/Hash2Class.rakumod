@@ -351,7 +351,7 @@ my sub scalar-hash2class(str $name, $type is raw, \default) {
 # Mapper for valid sigils
 my $sigils := nqp::hash('$', 1, '@', 1, '%', 1);
 
-role Hash2Class:ver<0.1.5>:auth<zef:lizmat>[*@list, *%hash] {
+role Hash2Class:ver<0.1.6>:auth<zef:lizmat>[*@list, *%hash] {
     has $!data;  # the raw data in a Hash
 
     # fetch whatever parameters we got
