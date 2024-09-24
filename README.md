@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/lizmat/Hash2Class/workflows/test/badge.svg)](https://github.com/lizmat/Hash2Class/actions)
+[![Actions Status](https://github.com/lizmat/Hash2Class/actions/workflows/linux.yml/badge.svg)](https://github.com/lizmat/Hash2Class/actions) [![Actions Status](https://github.com/lizmat/Hash2Class/actions/workflows/macos.yml/badge.svg)](https://github.com/lizmat/Hash2Class/actions) [![Actions Status](https://github.com/lizmat/Hash2Class/actions/workflows/windows.yml/badge.svg)](https://github.com/lizmat/Hash2Class/actions)
 
 NAME
 ====
@@ -9,51 +9,51 @@ SYNOPSIS
 ========
 
 ```raku
-  use Hash2Class;
+use Hash2Class;
 
-  class UpdateInfo does Hash2Class[
-    added   => Date(Str),
-    changed => Date(Str),
-  ] { }
+class UpdateInfo does Hash2Class[
+  added   => Date(Str),
+  changed => Date(Str),
+] { }
 
-  class FBB does Hash2Class[
-    "foo",
-    bar        => Int,
-    baz        => UpdateInfo,
-    '@bazlist' => UpdateInfo,
-    '%bazmap'  => UpdateInfo,
-    zap => {
-      type => Str,
-      name => "zippo",
-      why  => "Because we can",
-    },
-  ] { }
+class FBB does Hash2Class[
+  "foo",
+  bar        => Int,
+  baz        => UpdateInfo,
+  '@bazlist' => UpdateInfo,
+  '%bazmap'  => UpdateInfo,
+  zap => {
+    type => Str,
+    name => "zippo",
+    why  => "Because we can",
+  },
+] { }
 
-  my %hash =
-    foo => "foo",
-    bar => 42,
-    baz => {
-      added   => "2020-07-18",
-      changed => "2020-07-19",
-    },
-    bazlist => [
-      { added => "2020-07-14", changed => "2020-07-15" },
-      { added => "2020-07-16", changed => "2020-07-17" },
-    ],
-    bazmap => {
-      first  => { added => "2020-07-01", changed => "2020-07-02" },
-      second => { added => "2020-07-03", changed => "2020-07-04" },
-      third  => { added => "2020-07-05", changed => "2020-07-06" },
-    },
-    zap => "Groucho",
-  ;
+my %hash =
+  foo => "foo",
+  bar => 42,
+  baz => {
+    added   => "2020-07-18",
+    changed => "2020-07-19",
+  },
+  bazlist => [
+    { added => "2020-07-14", changed => "2020-07-15" },
+    { added => "2020-07-16", changed => "2020-07-17" },
+  ],
+  bazmap => {
+    first  => { added => "2020-07-01", changed => "2020-07-02" },
+    second => { added => "2020-07-03", changed => "2020-07-04" },
+    third  => { added => "2020-07-05", changed => "2020-07-06" },
+  },
+  zap => "Groucho",
+;
 
-  my $fbb = FBB.new(%hash);
-  dd $fbb.foo;                    # "foo"
-  dd $fbb.bar;                    # 42
-  dd $fbb.zippo;                  # "Groucho"
-  dd $fbb.bazlist[1].added;       # Date.new("2020-07-01")
-  dd $fbb.bazmap<third>.changed;  # Date.new("2020-07-06")
+my $fbb = FBB.new(%hash);
+dd $fbb.foo;                    # "foo"
+dd $fbb.bar;                    # 42
+dd $fbb.zippo;                  # "Groucho"
+dd $fbb.bazlist[1].added;       # Date.new("2020-07-01")
+dd $fbb.bazmap<third>.changed;  # Date.new("2020-07-06")
 ```
 
 DESCRIPTION
@@ -83,32 +83,42 @@ There are three modes of parameterization:
 
   * identifier
 
-    "foo",
+```raku
+"foo",
+```
 
 Just specifying an identifier (a string of a single word), will create a method with the same name, and assume the value is a `Str`.
 
   * identifier => type
 
-    bar => Int,
+```raku
+bar => Int,
+```
 
 A pair consisting of an identifier and a type, will create a method with the same name as the identifier, and assume the value is constraint by the given type.
 
 The type can also be specified as a string if necessary:
 
-    bar => "Int",
+```raku
+bar => "Int",
+```
 
 Coercing types are also supported:
 
-    bar => Int(Str),
+```raku
+bar => Int(Str),
+```
 
   * identifier => { ... }
 
-    zap => {
-      type    => Str,
-      name    => "zippo",
-      default => "(none)",
-      why     => "Because we can",
-    },
+```raku
+zap => {
+  type    => Str,
+  name    => "zippo",
+  default => "(none)",
+  why     => "Because we can",
+},
+```
 
 A pair consisting of an identifier and a `Hash` with further parameterization values.
 
@@ -127,17 +137,21 @@ METHODS
 new
 ---
 
-    my $foo = Foo.new(%hash);
+```raku
+my $foo = Foo.new(%hash);
+```
 
 An object of a class that does the `Hash2Class` role, is created by calling the `new` method with a hash of keys and values. Each of these values can be another hash or array: these will be handled automatically if they were so parameterized.
 
 invalid
 -------
 
-    with $foo.invalid {
-        note "Errors found:";
-        dd $_;
-    }
+```raku
+with $foo.invalid {
+    note "Errors found:";
+    dd $_;
+}
+```
 
 The `invalid` method either returns `Nil` if all values in the hash where valid. Otherwise it returns a hash of error messages of which the keys are the names of the `methods`, and the values are the error messages. Please note that this check will access *all* values in the hash, so it may take some time for big hashes.
 
@@ -148,10 +162,12 @@ Elizabeth Mattijsen <liz@raku.rocks>
 
 Source can be located at: https://github.com/lizmat/Hash2Class . Comments and Pull Requests are welcome.
 
+If you like this module, or what I'm doing more generally, committing to a [small sponsorship](https://github.com/sponsors/lizmat/) would mean a great deal to me!
+
 COPYRIGHT AND LICENSE
 =====================
 
-Copyright 2020, 2021 Elizabeth Mattijsen
+Copyright 2020, 2021, 2024 Elizabeth Mattijsen
 
 This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
 

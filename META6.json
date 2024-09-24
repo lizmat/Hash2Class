@@ -20,7 +20,8 @@
   "source-url": "https://github.com/lizmat/Hash2Class.git",
   "tags": [
     "JSON",
-    "CLASS"
+    "CLASS",
+    "NAUGHTY"
   ],
   "test-depends": [
   ],
