@@ -1,6 +1,8 @@
 Revision history for Hash2Class
 
 {{$NEXT}}
+
+0.1.7  2025-02-12T14:35:02+01:00
     - Fix issue with POPULATE not being ignored
     - Update copyright year
 
