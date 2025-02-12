@@ -444,7 +444,8 @@ role Hash2Class:ver<0.1.6>:auth<zef:lizmat>[*@list, *%hash] {
         )
     }
 
-    my constant $skip := nqp::hash('new',1,'invalid',1,'raku',1,'BUILDALL',1);
+    my constant $skip :=
+      nqp::hash('new',1,'invalid',1,'raku',1,'BUILDALL',1,'POPULATE',1);
 
     method invalid(::?CLASS:D:) {
         my $sorries := nqp::hash;
